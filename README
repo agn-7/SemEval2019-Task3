@@ -1,0 +1,22 @@
+███████╗███████╗███╗   ███╗███████╗██╗   ██╗ █████╗ ██╗
+██╔════╝██╔════╝████╗ ████║██╔════╝██║   ██║██╔══██╗██║
+███████╗█████╗  ██╔████╔██║█████╗  ██║   ██║███████║██║
+╚════██║██╔══╝  ██║╚██╔╝██║██╔══╝  ╚██╗ ██╔╝██╔══██║██║
+███████║███████╗██║ ╚═╝ ██║███████╗ ╚████╔╝ ██║  ██║███████╗
+╚══════╝╚══════╝╚═╝     ╚═╝╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝
+
+
+DESCRIPTION
+  In this task, you are given a textual dialogue i.e. a user utterance along
+  with two turns of context, you have to classify the emotion of user utterance
+  as one of the emotion classes: Happy, Sad, Angry or Others.
+
+USAGE
+
+
+CONTRIBUTORS
+  Sirine Kéfi
+  Carine Zhang
+  Thibaud Chominot
+  Hussem Ben Belgacem
+  Guillaume Drapala-Bizouarn
