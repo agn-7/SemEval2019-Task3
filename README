@@ -11,8 +11,19 @@ DESCRIPTION
   with two turns of context, you have to classify the emotion of user utterance
   as one of the emotion classes: Happy, Sad, Angry or Others.
 
-USAGE
+REQUIREMENTS
+  ° python 3
+  ° pandas
+  ° numpy
+  ° tensorflow
+  ° scikit-learn
+  ° keras
 
+USAGE
+  For the baseline:
+    python baseline.py -config testBaseline.config
+
+  For our program:
 
 CONTRIBUTORS
   Sirine Kéfi
