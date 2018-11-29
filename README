@@ -18,6 +18,8 @@ REQUIREMENTS
   ° tensorflow
   ° scikit-learn
   ° keras
+  ° ekphrasis
+  ° nltk
 
 USAGE
   For the baseline:
