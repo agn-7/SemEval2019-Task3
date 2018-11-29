@@ -26,20 +26,9 @@ text_processor = TextPreProcessor(
 
 def preprocess(text):
     txt = text_processor.pre_process_doc(text)
-    return list(filter(lambda x: x not in tags and
+    preprocessed_txt = list(filter(lambda x: x not in tags and
                                  x not in stopwords and
                                  x not in punctuation, txt))
-
-"""
-sentences = [
-    "CANT WAIT for the new season of #TwinPeaks ＼(^o^)／!!! #davidlynch #tvseries :)))",
-    "I saw the new #johndoe movie and it suuuuucks!!! WAISTED $10... #badmovies :/",
-    "@SentimentSymp: plz we'll can't wait for the Nov 9 25,000  25.000 #Sentiment talks!  YAAAAAAY !!! :-D :@ <3 http://sentimentsymposium.com/."
-]
-
-for s in sentences:
-    preprocessed_txt = preprocess(s)
     preprocessed_txt = list(map(lambda x: str2emoji(x), preprocessed_txt))
-    preprocessed_txt = ' '.join(preprocessed_txt)
-    print(preprocessed_txt)
-"""
+    return ' '.join(preprocessed_txt)
+    
