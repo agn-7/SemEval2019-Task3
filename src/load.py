@@ -20,12 +20,11 @@ def load_preprocessed_data(path, training=True):
         t1 = turn1.apply(lambda x: preprocess(x))
         t2 = turn2.apply(lambda x: preprocess(x))
         t3 = turn3.apply(lambda x: preprocess(x))
-        return id, t1, t2, t3
+        return id.values, t1.values, t2.values, t3.values
     else:
         id, turn1, turn2, turn3, label = load_data(path, training)
         t1 = turn1.apply(lambda x: preprocess(x))
         t2 = turn2.apply(lambda x: preprocess(x))
         t3 = turn3.apply(lambda x: preprocess(x))
         l = label.apply(lambda x: emotion2label[x])
-        return id, t1, t2, t3, l
-        
+        return id.values, t1.values, t2.values, t3.values, l.values

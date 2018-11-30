@@ -20,12 +20,14 @@ REQUIREMENTS
   ° keras
   ° ekphrasis
   ° nltk
+  ° glove data (http://nlp.stanford.edu/data/glove.840B.300d.zip)
 
 USAGE
   For the baseline:
     python baseline.py -config testBaseline.config
 
   For our program:
+    python train.py -config configuration.config
 
 CONTRIBUTORS
   Sirine Kéfi
