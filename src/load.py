@@ -4,6 +4,7 @@ import pandas as pd
 
 label2emotion = {0:"others", 1:"happy", 2: "sad", 3:"angry"}
 emotion2label = {"others":0, "happy":1, "sad":2, "angry":3}
+emotionexternal2label = {"surprise": 0, "love":0, "fear":0 ,"joy":1,"sadness":2, "anger":3}
 
 
 def load_data(path, training):
@@ -28,3 +29,15 @@ def load_preprocessed_data(path, training=True):
         t3 = turn3.apply(lambda x: preprocess(x))
         l = label.apply(lambda x: emotion2label[x])
         return id.values, t1.values, t2.values, t3.values, l.values
+
+
+def load_external_data(path):
+    data = pd.read_csv(path, encoding='utf-8', sep=',')
+    return data['text'], data['emotions']
+
+
+def load_preprocessed_external_data(path):
+    text, label = load_external_data(path)
+    t = text.apply(lambda x: preprocess(x))
+    l = label.apply(lambda x: emotionexternal2label[x])
+    return t.values, l.values
