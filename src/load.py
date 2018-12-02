@@ -4,40 +4,24 @@ import pandas as pd
 
 label2emotion = {0:"others", 1:"happy", 2: "sad", 3:"angry"}
 emotion2label = {"others":0, "happy":1, "sad":2, "angry":3}
-emotionexternal2label = {"surprise": 0, "love":0, "fear":0 ,"joy":1,"sadness":2, "anger":3}
 
 
 def load_data(path, training):
     data = pd.read_csv(path, encoding='utf-8', sep='\t')
+    text = data[['turn1', 'turn2', 'turn3']].apply(lambda x: ' '.join(x), axis=1)
     if not training:
-        return data['id'], data['turn1'], data['turn2'], data['turn3']
+        return data['id'], text
     else:
-        return data['id'], data['turn1'], data['turn2'], data['turn3'], data['label']
+        return data['id'], text, data['label']
 
 
 def load_preprocessed_data(path, training=True):
     if not training:
-        id, turn1, turn2, turn3 = load_data(path, training)
-        t1 = turn1.apply(lambda x: preprocess(x))
-        t2 = turn2.apply(lambda x: preprocess(x))
-        t3 = turn3.apply(lambda x: preprocess(x))
-        return id.values, t1.values, t2.values, t3.values
+        id, text = load_data(path, training)
+        t = text.apply(lambda x: preprocess(x))
+        return id.values.tolist(), t.values.tolist()
     else:
-        id, turn1, turn2, turn3, label = load_data(path, training)
-        t1 = turn1.apply(lambda x: preprocess(x))
-        t2 = turn2.apply(lambda x: preprocess(x))
-        t3 = turn3.apply(lambda x: preprocess(x))
+        id, text, label = load_data(path, training)
+        t = text.apply(lambda x: preprocess(x))
         l = label.apply(lambda x: emotion2label[x])
-        return id.values, t1.values, t2.values, t3.values, l.values
-
-
-def load_external_data(path):
-    data = pd.read_csv(path, encoding='utf-8', sep=',')
-    return data['text'], data['emotions']
-
-
-def load_preprocessed_external_data(path):
-    text, label = load_external_data(path)
-    t = text.apply(lambda x: preprocess(x))
-    l = label.apply(lambda x: emotionexternal2label[x])
-    return t.values, l.values
+        return id.values.tolist(), t.values.tolist(), l.values.tolist()
