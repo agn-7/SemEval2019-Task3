@@ -175,7 +175,7 @@ def model4(embeddingMatrix):
                                 EMBEDDING_DIM,
                                 weights=[embeddingMatrix],
                                 input_length=MAX_SEQUENCE_LENGTH,
-                                trainable=False)
+                                trainable=True)
     model = Sequential()
     model.add(embeddingLayer)
     model.add(Conv1D(32, 3, padding='same', activation='relu'))
@@ -243,7 +243,7 @@ def main():
     print("Building model...")
     cbks = [ModelCheckpoint('./model1.h5', verbose=1, monitor='val_loss', save_best_only=True, mode='auto'),
             EarlyStopping(monitor='val_loss', patience=2)]
-    model = model2(embeddingMatrix)
+    model = model4(embeddingMatrix)
     model.fit(u_data, labels, validation_split=0.1, epochs=NUM_EPOCHS, batch_size=BATCH_SIZE, callbacks=cbks)
     model = load_model('./model1.h5')
     print("Creating solution file...")

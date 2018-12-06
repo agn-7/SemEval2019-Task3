@@ -2,9 +2,9 @@
 #from ekphrasis.classes.tokenizer import SocialTokenizer
 #from ekphrasis.dicts.noslang.slangdict import slangdict
 from emoticons import str2emoji
+from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from string import punctuation
-import nltk
 from tokenizer import tokenizer
 import re
 
@@ -35,6 +35,7 @@ def preprocess(text):
                                  x not in punctuation, txt))
     preprocessed_txt = list(map(lambda x: str2emoji(x), preprocessed_txt))
     return ' '.join(preprocessed_txt)
+
 """
 
 def contraction_removal(tweet):
@@ -43,6 +44,10 @@ def contraction_removal(tweet):
     tweet = re.sub(r"\u002c", "'", tweet)
 
     #contractions
+    tweet = re.sub(r"u r "," you are ",tweet)
+    tweet = re.sub(r"U r "," you are ",tweet)
+    tweet = re.sub(r" u(\s|$)"," you ",tweet)
+    tweet = re.sub(r"didnt","did not",tweet)
     tweet = re.sub(r"\'ve", " have", tweet)
     tweet = re.sub(r" can\'t", " cannot", tweet)
     tweet = re.sub(r"n\'t", " not", tweet)
@@ -52,6 +57,7 @@ def contraction_removal(tweet):
     tweet = re.sub(r"\'s", "", tweet)
     tweet = re.sub(r"\'n", "", tweet)
     tweet = re.sub(r"\'m", " am", tweet)
+    tweet = re.sub(r" plz[\s|$]", " please ",tweet)
 
     return tweet
 
@@ -82,7 +88,7 @@ def tokenize(tweet):
 
 
 def lemmatize(tokenizedTweet):
-    L = nltk.stem.WordNetLemmatizer()
+    L = WordNetLemmatizer()
     return list(map(L.lemmatize, tokenizedTweet))
 
 
