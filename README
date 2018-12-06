@@ -18,8 +18,8 @@ REQUIREMENTS
   ° tensorflow
   ° scikit-learn
   ° keras
-  ° ekphrasis
   ° nltk
+  ° tweet tokenizer (pip install git+https://github.com/erikavaris/tokenizer.git)
   ° glove data (http://nlp.stanford.edu/data/glove.840B.300d.zip)
 
 USAGE
