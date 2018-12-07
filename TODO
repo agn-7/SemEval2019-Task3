@@ -8,6 +8,6 @@
 
 1. Preprocessing                        DONE
 2. Create Models                        DONE
-3. K-fold cross-validation              DONE
-4. Evaluate Models with F1 score        DONE
-5. Soft voting                          TODO
+3. K-fold cross-validation              TODO
+4. Evaluate Models with F1 score        TODO
+5. Soft voting                          DONE
