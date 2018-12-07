@@ -18,6 +18,7 @@ from keras import optimizers
 
 np.random.seed(7)
 
+
 trainDataPath = ""
 testDataPath = ""
 solutionPath = ""
@@ -100,7 +101,6 @@ def getEmbeddingMatrix(wordIndex):
             embeddingMatrix[i] = oov
 
     return embeddingMatrix
-
 
 
 def model1(embeddingMatrix):
@@ -195,12 +195,59 @@ def model5(embeddingMatrix):
                                 EMBEDDING_DIM,
                                 weights=[embeddingMatrix],
                                 input_length=MAX_SEQUENCE_LENGTH,
-                                trainable=False)
+                                trainable=True)
     model = Sequential()
     model.add(embeddingLayer)
-    model.add(LSTM(LSTM_DIM))
+    model.add(LSTM(LSTM_DIM, return_sequences=True))
     model.add(Conv1D(32, 3, padding='same', activation='relu'))
     model.add(MaxPool1D(2))
+    model.add(Flatten())
+    model.add(Dropout(DROPOUT))
+    model.add(Dense(NUM_CLASSES, activation='softmax'))
+    adam = optimizers.adam(lr=LEARNING_RATE)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=adam,
+                  metrics=['acc'])
+    model.summary()
+    return model
+
+
+def model6(embeddingMatrix):
+    embeddingLayer = Embedding(embeddingMatrix.shape[0],
+                                EMBEDDING_DIM,
+                                weights=[embeddingMatrix],
+                                input_length=MAX_SEQUENCE_LENGTH,
+                                trainable=True)
+    model = Sequential()
+    model.add(embeddingLayer)
+    model.add(Conv1D(32, 3, padding='same', activation='relu'))
+    model.add(MaxPool1D(2))
+    model.add(Dropout(DROPOUT))
+    model.add(Bidirectional(LSTM(LSTM_DIM)))
+    model.add(Dropout(DROPOUT))
+    model.add(Dense(NUM_CLASSES, activation='softmax'))
+    adam = optimizers.adam(lr=LEARNING_RATE)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=adam,
+                  metrics=['acc'])
+    model.summary()
+    return model
+
+
+def model7(embeddingMatrix):
+    embeddingLayer = Embedding(embeddingMatrix.shape[0],
+                                EMBEDDING_DIM,
+                                weights=[embeddingMatrix],
+                                input_length=MAX_SEQUENCE_LENGTH,
+                                trainable=True)
+    model = Sequential()
+    model.add(embeddingLayer)
+    model.add(Bidirectional(LSTM(LSTM_DIM, return_sequences=True)))
+    model.add(Dropout(DROPOUT))
+    model.add(Conv1D(32, 3, padding='same', activation='relu'))
+    model.add(MaxPool1D(2))
+    model.add(Flatten())
+    model.add(Dropout(DROPOUT))
     model.add(Dense(NUM_CLASSES, activation='softmax'))
     adam = optimizers.adam(lr=LEARNING_RATE)
     model.compile(loss='categorical_crossentropy',
@@ -243,7 +290,7 @@ def main():
     print("Building model...")
     cbks = [ModelCheckpoint('./model1.h5', verbose=1, monitor='val_loss', save_best_only=True, mode='auto'),
             EarlyStopping(monitor='val_loss', patience=2)]
-    model = model4(embeddingMatrix)
+    model = model7(embeddingMatrix)
     model.fit(u_data, labels, validation_split=0.1, epochs=NUM_EPOCHS, batch_size=BATCH_SIZE, callbacks=cbks)
     model = load_model('./model1.h5')
     print("Creating solution file...")
