@@ -11,7 +11,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from sklearn.model_selection import KFold
-from keras.layers import Input, Dense, Embedding, LSTM, Concatenate, Reshape, GRU, Bidirectional, Dropout, Conv1D, Flatten, MaxPool1D
+from keras.layers import Input, Dense, Embedding, LSTM, Concatenate, Reshape, GRU, Bidirectional, Dropout, Conv1D, Flatten, MaxPool1D, TimeDistributed
 from keras.models import Sequential
 from keras import optimizers
 
@@ -255,7 +255,27 @@ def model7(embeddingMatrix):
                   metrics=['acc'])
     model.summary()
     return model
-    
+
+
+def model8(embeddingMatrix):
+    embeddingLayer = Embedding(embeddingMatrix.shape[0],
+                                EMBEDDING_DIM,
+                                weights=[embeddingMatrix],
+                                input_length=MAX_SEQUENCE_LENGTH,
+                                trainable=True)
+    model = Sequential()
+    model.add(embeddingLayer)
+    model.add(Bidirectional(LSTM(LSTM_DIM, dropout=0.6)))
+    model.add(Dropout(0.9))
+    model.add(Dense(100, activation='tanh'))
+    model.add(Dropout(0.9))
+    model.add(Dense(NUM_CLASSES, activation='softmax'))
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adadelta',
+                  metrics=['acc'])
+    model.summary()
+    return model
+
 
 def main():
     parser = argparse.ArgumentParser(description="Baseline Script for SemEval")
@@ -289,9 +309,9 @@ def main():
 
     print("Building model...")
     cbks = [ModelCheckpoint('./model1.h5', verbose=1, monitor='val_loss', save_best_only=True, mode='auto'),
-            EarlyStopping(monitor='val_loss', patience=2)]
-    model = model7(embeddingMatrix)
-    model.fit(u_data, labels, validation_split=0.1, epochs=NUM_EPOCHS, batch_size=BATCH_SIZE, callbacks=cbks)
+            EarlyStopping(monitor='val_loss', patience=10)]
+    model = model8(embeddingMatrix)
+    model.fit(u_data, labels, validation_split=0.1, epochs=200, batch_size=10, shuffle=True, callbacks=cbks)
     model = load_model('./model1.h5')
     print("Creating solution file...")
     create_solution_file(model, u_testSequences)
