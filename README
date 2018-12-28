@@ -19,14 +19,11 @@ REQUIREMENTS
   ° scikit-learn
   ° keras
   ° nltk
+  ° ekphrasis
   ° tweet tokenizer (pip install git+https://github.com/erikavaris/tokenizer.git)
-  ° glove data (http://nlp.stanford.edu/data/glove.840B.300d.zip)
+  ° glove data (http://nlp.stanford.edu/data/glove.840B.300d.zip) need to be put in the folder data
 
 USAGE
-  For the baseline:
-    python baseline.py -config testBaseline.config
-
-  For our program:
     python train.py -config configuration.config
 
 CONTRIBUTORS

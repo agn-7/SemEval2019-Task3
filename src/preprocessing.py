@@ -1,3 +1,5 @@
+from ekphrasis.classes.preprocessor import TextPreProcessor
+from ekphrasis.classes.tokenizer import SocialTokenizer
 from emoticons import str2emoji
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -7,6 +9,28 @@ import re
 
 
 stopwords = set(stopwords.words('english')) - set(('not', 'no'))
+
+
+tags = ['<url>', '<email>', '<user>', '<hashtag>', '</hashtag>',
+        '<elongated>', '</elongated>', '<repeated>', '</repeated>']
+
+
+text_processor = TextPreProcessor(
+    normalize=['url', 'email', 'user'],
+    annotate={'hashtag', 'elongated', 'repeated'},
+    segmenter="twitter",
+    corrector="twitter",
+    unpack_hashtags=True,
+    unpack_contractions=True,
+    tokenizer=SocialTokenizer(lowercase=True).tokenize
+)
+
+
+def preprocess(text):
+    txt = text_processor.pre_process_doc(text)
+    return list(filter(lambda x: x not in tags and
+                                 x not in stopwords and
+                                 x not in punctuation, txt))
 
 
 def contraction_removal(tweet):
@@ -67,5 +91,5 @@ def normalize(lemmatizedTweet):
     return list(filter(lambda x: x not in stopwords, lemmatizedTweet))
 
 
-def preprocess(tweet):
+def simple_preprocess(tweet):
     return normalize(lemmatize(tokenize(tweet)))

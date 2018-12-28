@@ -350,6 +350,48 @@ def model8(embeddingMatrix):
     return model
 
 
+def model9(embeddingMatrix):
+    embeddingLayer = Embedding(embeddingMatrix.shape[0],
+                                EMBEDDING_DIM,
+                                weights=[embeddingMatrix],
+                                input_length=MAX_SEQUENCE_LENGTH,
+                                trainable=True)
+    model = Sequential()
+    model.add(embeddingLayer)
+    model.add(Conv1D(32, 3, padding='same', activation='relu'))
+    model.add(MaxPool1D(2))
+    model.add(GRU(LSTM_DIM))
+    model.add(Dense(NUM_CLASSES, activation='softmax'))
+    adam = optimizers.adam(lr=LEARNING_RATE)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=adam,
+                  metrics=['acc'])
+    model.summary()
+    return model
+
+
+def model10(embeddingMatrix):
+    embeddingLayer = Embedding(embeddingMatrix.shape[0],
+                                EMBEDDING_DIM,
+                                weights=[embeddingMatrix],
+                                input_length=MAX_SEQUENCE_LENGTH,
+                                trainable=True)
+    model = Sequential()
+    model.add(embeddingLayer)
+    model.add(GRU(LSTM_DIM, return_sequences=True))
+    model.add(Conv1D(32, 3, padding='same', activation='relu'))
+    model.add(MaxPool1D(2))
+    model.add(Flatten())
+    model.add(Dropout(0.4))
+    model.add(Dense(NUM_CLASSES, activation='softmax'))
+    adam = optimizers.adam(lr=LEARNING_RATE)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=adam,
+                  metrics=['acc'])
+    model.summary()
+    return model
+
+
 def main():
     parser = argparse.ArgumentParser(description="Baseline Script for SemEval")
     parser.add_argument('-config', help='Config to read details', required=True)
@@ -389,7 +431,7 @@ def main():
     cbks = [ModelCheckpoint('./model1.h5', verbose=1, monitor='val_loss', save_best_only=True, mode='auto'),
             EarlyStopping(monitor='val_loss', patience=2),
             TestCallback((u_validation, labels_validation))]
-    model = model4(embeddingMatrix)
+    model = model10(embeddingMatrix)
     model.fit(u_data, labels, validation_data=(u_validation, labels_validation), epochs=NUM_EPOCHS, batch_size=BATCH_SIZE, shuffle=True, callbacks=cbks)
     model = load_model('./model1.h5')
     print("Creating solution file...")
