@@ -19,6 +19,7 @@ from sklearn.model_selection import train_test_split
 np.random.seed(7)
 
 
+#Keras Callback to compute F1 score for each epoch
 class TestCallback(Callback):
     def __init__(self, test_data):
         self.test_data = test_data
@@ -47,6 +48,7 @@ LEARNING_RATE = None
 NUM_EPOCHS = None
 
 
+#load the configuration data
 def load_config(configPath):
     with open(configPath) as configfile:
         config = json.load(configfile)
@@ -54,7 +56,7 @@ def load_config(configPath):
     global validationDataPath, trainDataPath, testDataPath, solutionPath, gloveDir
     global NUM_FOLDS, NUM_CLASSES, MAX_NB_WORDS, EMBEDDING_DIM
     global BATCH_SIZE, LSTM_DIM, DROPOUT, NUM_EPOCHS, LEARNING_RATE, MAX_SEQUENCE_LENGTH
-    
+
     validationDataPath = config["validation_data_path"]
     trainDataPath = config["train_data_path"]
     testDataPath = config["test_data_path"]
@@ -73,6 +75,7 @@ def load_config(configPath):
     NUM_EPOCHS = config["num_epochs"]
 
 
+#generate the test.txt file to be submitted
 def create_solution_file(model,u_testSequences):
     u_testData = pad_sequences(u_testSequences, maxlen=MAX_SEQUENCE_LENGTH)
     predictions = model.predict(u_testData, batch_size=BATCH_SIZE)
@@ -91,6 +94,7 @@ def create_solution_file(model,u_testSequences):
     return
 
 
+#Create the embedding matrix
 def getEmbeddingMatrix(wordIndex):
     embeddingsIndex = {}
     with io.open(os.path.join(gloveDir, 'glove.840B.300d.txt'), encoding="utf8") as f:
@@ -115,6 +119,7 @@ def getEmbeddingMatrix(wordIndex):
     return embeddingMatrix
 
 
+#Compute the micro F1 score, the average accuracy, the micro precision and the micro recall
 def getMetrics(predictions, ground):
     """Given predicted labels and the respective ground truth labels, display some metrics
     Input: shape [# of samples, NUM_CLASSES]
@@ -124,19 +129,19 @@ def getMetrics(predictions, ground):
         accuracy : Average accuracy
         microPrecision : Precision calculated on a micro level. Ref - https://datascience.stackexchange.com/questions/15989/micro-average-vs-macro-average-performance-in-a-multiclass-classification-settin/16001
         microRecall : Recall calculated on a micro level
-        microF1 : Harmonic mean of microPrecision and microRecall. Higher value implies better classification  
+        microF1 : Harmonic mean of microPrecision and microRecall. Higher value implies better classification
     """
     # [0.1, 0.3 , 0.2, 0.1] -> [0, 1, 0, 0]
     discretePredictions = to_categorical(predictions.argmax(axis=1))
-    
+
     truePositives = np.sum(discretePredictions*ground, axis=0)
     falsePositives = np.sum(np.clip(discretePredictions - ground, 0, 1), axis=0)
     falseNegatives = np.sum(np.clip(ground-discretePredictions, 0, 1), axis=0)
-    
+
     print("True Positives per class : ", truePositives)
     print("False Positives per class : ", falsePositives)
     print("False Negatives per class : ", falseNegatives)
-    
+
     # ------------- Macro level calculation ---------------
     macroPrecision = 0
     macroRecall = 0
@@ -148,34 +153,35 @@ def getMetrics(predictions, ground):
         macroRecall += recall
         f1 = ( 2 * recall * precision ) / (precision + recall) if (precision+recall) > 0 else 0
         print("Class %s : Precision : %.3f, Recall : %.3f, F1 : %.3f" % (label2emotion[c], precision, recall, f1))
-    
+
     macroPrecision /= 3
     macroRecall /= 3
     macroF1 = (2 * macroRecall * macroPrecision ) / (macroPrecision + macroRecall) if (macroPrecision+macroRecall) > 0 else 0
-    print("Ignoring the Others class, Macro Precision : %.4f, Macro Recall : %.4f, Macro F1 : %.4f" % (macroPrecision, macroRecall, macroF1))   
-    
+    print("Ignoring the Others class, Macro Precision : %.4f, Macro Recall : %.4f, Macro F1 : %.4f" % (macroPrecision, macroRecall, macroF1))
+
     # ------------- Micro level calculation ---------------
     truePositives = truePositives[1:].sum()
     falsePositives = falsePositives[1:].sum()
-    falseNegatives = falseNegatives[1:].sum()    
-    
+    falseNegatives = falseNegatives[1:].sum()
+
     print("Ignoring the Others class, Micro TP : %d, FP : %d, FN : %d" % (truePositives, falsePositives, falseNegatives))
-    
+
     microPrecision = truePositives / (truePositives + falsePositives)
     microRecall = truePositives / (truePositives + falseNegatives)
-    
+
     microF1 = ( 2 * microRecall * microPrecision ) / (microPrecision + microRecall) if (microPrecision+microRecall) > 0 else 0
     # -----------------------------------------------------
-    
+
     predictions = predictions.argmax(axis=1)
     ground = ground.argmax(axis=1)
     accuracy = np.mean(predictions==ground)
-    
+
     print("Accuracy : %.4f, Micro Precision : %.4f, Micro Recall : %.4f, Micro F1 : %.4f" % (accuracy, microPrecision, microRecall, microF1))
-    
+
     return accuracy, microPrecision, microRecall, microF1
 
 
+#Bidirectional LSTM Model
 def model1(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -196,6 +202,7 @@ def model1(embeddingMatrix):
     return model
 
 
+#GRU Model
 def model2(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -218,6 +225,7 @@ def model2(embeddingMatrix):
     return model
 
 
+#CNN Model
 def model3(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -243,6 +251,7 @@ def model3(embeddingMatrix):
     return model
 
 
+#CNN-LSTM Model
 def model4(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -263,6 +272,7 @@ def model4(embeddingMatrix):
     return model
 
 
+#LSTM-CNN Model
 def model5(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -285,6 +295,7 @@ def model5(embeddingMatrix):
     return model
 
 
+#CNN-BiLSTM Model
 def model6(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -307,6 +318,7 @@ def model6(embeddingMatrix):
     return model
 
 
+#BiLSTM-CNN Model
 def model7(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -330,6 +342,7 @@ def model7(embeddingMatrix):
     return model
 
 
+#BiLSTM Model without dropout after embedding layer
 def model8(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -350,6 +363,7 @@ def model8(embeddingMatrix):
     return model
 
 
+#CNN-GRU Model
 def model9(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -370,6 +384,7 @@ def model9(embeddingMatrix):
     return model
 
 
+#GRU-CNN Model
 def model10(embeddingMatrix):
     embeddingLayer = Embedding(embeddingMatrix.shape[0],
                                 EMBEDDING_DIM,
@@ -393,10 +408,12 @@ def model10(embeddingMatrix):
 
 
 def main():
+    #parse the given command
     parser = argparse.ArgumentParser(description="Baseline Script for SemEval")
     parser.add_argument('-config', help='Config to read details', required=True)
     args = parser.parse_args()
 
+    #load configuration from given file
     load_config(args.config)
 
     print("Processing training data...")

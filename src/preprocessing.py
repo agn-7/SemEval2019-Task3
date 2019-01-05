@@ -26,13 +26,15 @@ text_processor = TextPreProcessor(
 )
 
 
+#ekphrasis preprocessing + removing of tags added by ekphrasis +
+#stopwords and puntuation removal
 def preprocess(text):
     txt = text_processor.pre_process_doc(text)
     return list(filter(lambda x: x not in tags and
                                  x not in stopwords and
                                  x not in punctuation, txt))
 
-
+#remove the most common contractions
 def contraction_removal(tweet):
     #replace uniquote to ascii quote
     tweet = re.sub(r"\u2019", "'", tweet)
@@ -57,6 +59,7 @@ def contraction_removal(tweet):
     return tweet
 
 
+#tokenize a tweet
 def tokenize(tweet):
     #remove email
     tweet = re.sub('\S*@\S*\s?', '', tweet)
@@ -82,14 +85,17 @@ def tokenize(tweet):
     return tweet
 
 
+#lemmatize a tokenized tweet
 def lemmatize(tokenizedTweet):
     L = WordNetLemmatizer()
     return list(map(L.lemmatize, tokenizedTweet))
 
 
+#normalize a lemmatized tweet
 def normalize(lemmatizedTweet):
     return list(filter(lambda x: x not in stopwords, lemmatizedTweet))
 
 
+#tokenize, lemmatize and normalize a tweet
 def simple_preprocess(tweet):
     return normalize(lemmatize(tokenize(tweet)))

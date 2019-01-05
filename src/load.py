@@ -6,6 +6,7 @@ label2emotion = {0:"others", 1:"happy", 2: "sad", 3:"angry"}
 emotion2label = {"others":0, "happy":1, "sad":2, "angry":3}
 
 
+#load formatted id, text and (eventually) label from file in path
 def load_data(path, training):
     data = pd.read_csv(path, encoding='utf-8', sep='\t')
     text = data[['turn1', 'turn2', 'turn3']].apply(lambda x: ' '.join(x), axis=1)
@@ -15,6 +16,7 @@ def load_data(path, training):
         return data['id'], text, data['label']
 
 
+#load data and preprocess them with ekphrasis
 def load_preprocessed_data(path, training=True):
     if not training:
         id, text = load_data(path, training)
