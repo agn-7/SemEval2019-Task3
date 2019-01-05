@@ -21,7 +21,7 @@ REQUIREMENTS
   ° nltk
   ° ekphrasis
   ° tweet tokenizer (pip install git+https://github.com/erikavaris/tokenizer.git)
-  ° glove data (http://nlp.stanford.edu/data/glove.840B.300d.zip) need to be put in the folder data
+  ° glove data (http://nlp.stanford.edu/data/glove.840B.300d.zip) need to be extracted in the folder data
 
 USAGE
     python train.py -config configuration.config
